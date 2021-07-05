@@ -14,14 +14,13 @@ class CreateMissionsLinesTable extends Migration
     public function up()
     {
         Schema::create('missions_lines', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid( 'mission_id')->nullable();
-            $table->string( 'title')->nullable();
-            $table->integer( 'quantity')->nullable();
-            $table->integer( 'price')->nullable();
-            $table->string( 'unity')->nullable();
+            $table->uuid('id')->unique();
+            $table->uuid('mission_id');
             $table->foreign('mission_id')->references('id')->on('missions');
-            $table->timestamps();
+            $table->string('title');
+            $table->integer('quantity');
+            $table->integer('price');
+            $table->string('unity');
         });
     }
 
