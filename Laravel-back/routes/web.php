@@ -16,4 +16,4 @@ use App\Http\Controllers\OrganisationController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('api/organisations', OrganisationController::class);
+
