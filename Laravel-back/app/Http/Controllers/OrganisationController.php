@@ -7,6 +7,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -16,65 +17,75 @@ use App\Models\Organisation;
 
 class OrganisationController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
-     * @return Collection|Builder[]
+     * @return \Illuminate\Http\Response
      */
-    public function index(): array|Collection
+    public function index()
     {
-        return Organisation::query()->with('missions')->get();
+        return view('organisations', ['organisations' => Organisation::with('missions')->get()]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
-    public function create(): Response
+    public function create(Request $request)
     {
-        //
+        $organisation = Organisation::create(
+            [
+                'slug' => Str::slug($request->name),
+                'name' => $request->name,
+                'email' => $request->email,
+                'tel' => $request->tel,
+                'address' => $request->address,
+                'type' => $request->type,
+            ]
+        );
+        return redirect()->route('organisations.show');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        Organisation::query()->create([
-            'id' => Str::uuid(),
-            'slug' => $request->slug,
-            'name' => $request->name,
-            'email' => $request->email,
-            'tel' => $request->tel,
-            'address' => $request->address,
-            'type' => $request->type
-        ]);
+        $organisation = new \App\Models\Organisation;
+        $organisation->slug = $request->slug;
+        $organisation->name = $request->name;
+        $organisation->adress = $request->adress;
+        $organisation->tel = $request->tel;
+        $organisation->email = $request->email;
+        $organisation->type = $request->type;
+        $organisation->save();
+        $organisations = Organisation::all();
+        return view('organisations')->with('organisations', $organisations);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param int $id
-     * @return Application|Factory|View
+     * @param  \App\Models\Organisation  $organisation
+     * @return \Illuminate\Http\Response
      */
-    public function show(int $id): View|Factory|Application
+    public function show(Organisation $organisation)
     {
-        $organisation = DB::table('organisations')->where('id', $id)->first();
-
-        return view('organisation.index', ['organisation' => $organisation]);
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
-     * @return Response
+     * @param  \App\Models\Organisation  $organisation
+     * @return \Illuminate\Http\Response
      */
-    public function edit(int $id): Response
+    public function edit(Organisation $organisation)
     {
         //
     }
@@ -82,11 +93,11 @@ class OrganisationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int $id
-     * @return Response
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Organisation  $organisation
+     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, int $id): Response
+    public function update(Request $request, Organisation $organisation)
     {
         //
     }
@@ -94,10 +105,10 @@ class OrganisationController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
-     * @return Response
+     * @param  \App\Models\Organisation  $organisation
+     * @return \Illuminate\Http\Response
      */
-    public function destroy(int $id): Response
+    public function destroy(Organisation $organisation)
     {
         //
     }

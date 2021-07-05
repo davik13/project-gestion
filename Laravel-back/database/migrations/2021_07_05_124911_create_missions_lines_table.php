@@ -14,7 +14,13 @@ class CreateMissionsLinesTable extends Migration
     public function up()
     {
         Schema::create('missions_lines', function (Blueprint $table) {
-            $table->id();
+            $table->uuid(column: 'id')->primary();
+            $table->uuid(column: 'mission_id')->nullable();
+            $table->string(column: 'title')->nullable();
+            $table->integer(column: 'quantity')->nullable();
+            $table->integer(column: 'price')->nullable();
+            $table->string(column: 'unity')->nullable();
+            $table->foreign('mission_id')->references('id')->on('missions')->onDelete('cascade');
             $table->timestamps();
         });
     }

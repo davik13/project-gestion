@@ -17,3 +17,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('organisations', [OrganisationController::class, 'index'])->name('organisations');
