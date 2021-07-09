@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MissionLine extends Model
 {
     use HasFactory;
+    use HasUuid;
 
     public $incrementing = false;
 

@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
-
+use Illuminate\Http\Request;
+use App\Models\Mission;
+use App\Models\Organisation;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
-use App\Models\Organisation;
 
-class OrganisationController extends Controller
+class MissionController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): Appliaction|Factory|View
+    public function index()
     {
-        return view('auth.organisations.index', ['organisations' => Organisation::all()]);
+        $missions = Mission::all();
+
+        return view('mission.index', ['missions' => $missions]);
     }
 
     /**
@@ -30,8 +30,9 @@ class OrganisationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create()
     {
+        //
     }
 
     /**
@@ -40,17 +41,18 @@ class OrganisationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, Organisation $organisation): RedirectResponse
     {
-        Organisation::create([
+        $mission = $organisation->missions()->create([
             'id' => Str::uuid(),
-            'slug' => $request->slug,
-            'name' => $request->name,
-            'email' => $request->email,
-            'tel' => $request->tel,
-            'address' => $request->address,
-            'type' => $request->type
+            'reference' => $request->input('reference'),
+            'title' => $request->input('title'),
+            'comment' => $request->input('comment'),
+            'deposit' => $request->input('deposit'),
+            'ended_at' => $request->input('ended_at')
         ]);
+
+        $mission->missionLines()->createMany($request->input('mission_lines'));
 
         return redirect()->route('organisations.index');
     }
@@ -58,23 +60,23 @@ class OrganisationController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Organisation  $organisation
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show(string $id): View|Factory|Application
     {
-        $organisation = Organisation::find($id);
+        $mission = Mission::find($id);
 
-        return view('auth.organisation.show', ['organisation' => $organisation]);
+        return view('mission.show', ['mission' => $mission]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Organisation  $organisation
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Organisation $organisation)
+    public function edit($id)
     {
         //
     }
@@ -83,36 +85,36 @@ class OrganisationController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organisation  $organisation
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, string $id): RedirectResponse
     {
-        Organisation::where('id', $id)
+        Mission::where('id', $id)
         ->update([
-            'slug' => $request->slug,
-            'name' => $request->name,
-            'email' => $request->email,
-            'tel' => $request->tel,
-            'address' => $request->address,
-            'type' => $request->type
+            'reference' => $request->reference,
+            'organisation_id' => $request->organisation_id,
+            'title' => $request->title,
+            'comment' => $request->comment,
+            'deposit' => $request->deposit,
+            'ended_at' => $request->ended_at
         ]);
 
-    return redirect()->route('organisations.index');
+    return redirect()->route('missions.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Organisation  $organisation
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(string $id): RedirectResponse
     {
-        $organisation = Organisation::find($id);
+        $mission = Organisation::find($id);
 
-        $organisation->delete();
+        $mission->delete();
 
-        return redirect()->route('organisations.index');
+        return redirect()->route('missions.index');
     }
 }
